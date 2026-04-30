@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جسر الإشارة — مترجم لغة الإشارة العربية</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=3" />
+</head>
+
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="#hero">
+        <span class="logo-icon">&#9654;</span>
+        <span class="logo-text">جسر الإشارة</span>
+      </a>
+      <div class="direction-toggle" id="directionToggle">
+        <button class="direction-btn active" id="btnAr2En" data-dir="ar2en">عربي &#8594; English</button>
+        <button class="direction-btn" id="btnEn2Ar" data-dir="en2ar">English &#8594; عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero" class="hero">
+    <div class="container hero-content">
+      <h1 class="hero-title">مترجم لغة الإشارة<br>العربية</h1>
+      <p class="hero-subtitle">
+        اكتشاف فوري لإشارات الحروف العربية عبر الكاميرا،<br>
+        مع ترجمتها إلى الإنجليزية وعرضها بتهجئة إشارة أمريكية.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary btn-lg"
+          onclick="document.getElementById('translator').scrollIntoView({behavior:'smooth'})">
+          ابدأ الترجمة
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIVE TRANSLATOR ===== -->
+  <section id="translator" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">المترجم المباشر</h2>
+        <p class="section-subtitle">فعّل الكاميرا وابدأ بالإشارة. يتم اكتشاف الحروف تلقائياً.</p>
+      </div>
+
+      <div class="translator-grid">
+
+        <!-- Input Panel (camera OR typed text) -->
+        <div class="card camera-panel">
+          <div class="panel-header">
+            <div class="status-indicator">
+              <span class="status-dot" id="statusDot"></span>
+              <span class="status-label" id="statusLabel">في الانتظار</span>
+            </div>
+            <h3 class="panel-title">الإدخال</h3>
+          </div>
+
+          <div class="input-mode-toggle" role="tablist">
+            <button class="input-mode-btn active" id="inputModeCamera" type="button" data-input-mode="camera">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span>الكاميرا</span>
+            </button>
+            <button class="input-mode-btn" id="inputModeText" type="button" data-input-mode="text">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                <line x1="9" y1="20" x2="15" y2="20"></line>
+                <line x1="12" y1="4" x2="12" y2="20"></line>
+              </svg>
+              <span>اكتب نصاً</span>
+            </button>
+          </div>
+
+          <!-- Camera view -->
+          <div class="camera-wrapper" id="cameraView">
+            <video id="videoFeed" autoplay muted playsinline style="display:none;"></video>
+            <canvas id="cameraCanvas" width="640" height="480"></canvas>
+            <div class="camera-placeholder" id="cameraPlaceholder">
+              <div class="placeholder-icon">&#9654;</div>
+              <p>انقر على "بدء الكشف" لتفعيل الكاميرا</p>
+            </div>
+          </div>
+
+          <!-- Text input view -->
+          <div class="text-input-wrapper" id="textView" style="display:none;">
+            <textarea id="t2sInput" placeholder="اكتب هنا... / Type here..."></textarea>
+            <div class="t2s-lang-hint" id="t2sLangHint"></div>
+          </div>
+
+          <div class="camera-controls" id="cameraControls">
+            <button class="btn-primary" id="btnStart">بدء الكشف</button>
+            <button class="btn-secondary" id="btnClear" disabled>مسح</button>
+          </div>
+          <div class="camera-controls" id="textControls" style="display:none;">
+            <button class="btn-primary" id="btnT2SConvert">عرض بالإشارات</button>
+            <button class="btn-secondary" id="btnT2SClear">مسح</button>
+          </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div class="card text-panel">
+          <div class="panel-header">
+            <div class="mode-toggle">
+              <button class="mode-btn active" id="modeText" data-mode="text">نص</button>
+              <button class="mode-btn" id="modeSigns" data-mode="signs">إشارة ASL</button>
+            </div>
+            <h3 class="panel-title">الترجمة</h3>
+          </div>
+
+          <div class="text-section">
+            <label class="field-label"><span id="labelDetected">الإشارات المكتشفة</span></label>
+            <div class="arabic-display" id="arabicText" dir="rtl">
+              <span class="placeholder-text">ستظهر الإشارات هنا...</span>
+            </div>
+          </div>
+
+          <div class="arrow-divider">
+            <div class="arrow-line"></div>
+            <div class="arrow-icon">&#8595;</div>
+            <div class="arrow-line"></div>
+          </div>
+
+          <div class="text-section">
+            <label class="field-label"><span id="labelTranslated">الترجمة الإنجليزية</span></label>
+            <div class="english-display" id="englishText">
+              <span class="placeholder-text">ستظهر الترجمة هنا...</span>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-primary" id="btnTranslate" disabled>ترجمة</button>
+            <button class="btn-secondary" id="btnPlayAgain" disabled title="تشغيل الصوت مرة أخرى">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-left:4px;">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.47 4.47 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.5 8.5 0 0 0 14 3.23z"/>
+              </svg>
+              إعادة تشغيل الصوت
+            </button>
+          </div>
+        </div>
+
+        <!-- ASL Display Panel -->
+        <div class="card asl-panel">
+          <div class="panel-header">
+            <button class="btn-icon" id="btnReplay" title="إعادة التشغيل" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 .49-3.51"></path>
+              </svg>
+            </button>
+            <h3 class="panel-title"><span id="labelSignPanel">تهجئة إشارة أمريكية</span></h3>
+          </div>
+
+          <div class="asl-image-container" id="aslImageContainer">
+            <img id="aslSignImg" src="" alt="" class="asl-sign-img" style="display:none;" />
+            <div class="asl-placeholder" id="aslPlaceholder">
+              <div class="asl-placeholder-icon">&#9654;</div>
+              <p id="labelSignPlaceholder">ستظهر إشارات ASL هنا</p>
+            </div>
+          </div>
+
+          <div class="asl-letter-display" id="aslLetterDisplay" style="display:none;">
+            <span class="asl-current-letter" id="aslCurrentLetter"></span>
+          </div>
+
+          <div class="asl-progress" id="aslProgress"></div>
+
+          <div class="asl-complete" id="aslComplete" style="display:none;">
+            <span class="complete-badge">اكتملت</span>
+          </div>
+        </div>
+
+      </div><!-- /.translator-grid -->
+    </div>
+  </section>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="/static/js/camera.js?v=4"></script>
+  <script src="/static/js/asl-display.js?v=4"></script>
+  <script src="/static/js/text-to-sign.js?v=4"></script>
+  <script src="/static/js/app.js?v=4"></script>
+</body>
+
+</html>

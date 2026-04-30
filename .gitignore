@@ -1,0 +1,9 @@
+data/
+models/*.pt
+models/*.onnx
+__pycache__/
+*.pyc
+.env
+*.kaggle/
+runs/
+.claude/

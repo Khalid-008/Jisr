@@ -1,0 +1,9 @@
+# Arabic Sign Language Dataset - YOLOv5 format
+# 32 classes, 14,202 total images (9,955 train + 4,247 val)
+
+train: data/raw/datasets/train/images
+val: data/raw/datasets/valid/images
+
+nc: 32
+names: ['ain', 'al', 'aleff', 'bb', 'dal', 'dha', 'dhad', 'fa', 'gaaf', 'ghain', 'ha', 'haa', 'jeem', 'kaaf', 'khaa', 'la', 'laam',
+        'meem', 'nun', 'ra', 'saad', 'seen', 'sheen', 'ta', 'taa', 'thaa', 'thal', 'toot', 'waw', 'ya', 'yaa', 'zay']

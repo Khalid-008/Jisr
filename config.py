@@ -22,14 +22,20 @@ MAX_DETECTION_AREA = 0.50  # ignore detections covering >20% of frame (face/body
 WORD_PAUSE_THRESHOLD = 2.0  # seconds of no detection = word boundary
 SENTENCE_PAUSE_THRESHOLD = 4.0  # seconds of no detection = sentence boundary
 
-# English/ASL YOLOv5 Model
-ENGLISH_MODEL_PATH = os.path.join("models", "english_sign_best.pt")
+# English/ASL CNN Classifier
+ENGLISH_CLASSIFIER_PATH = os.path.join("models", "english_sign_classifier.pt")
+ENGLISH_CLASSIFIER_META_PATH = os.path.join("models", "english_classifier_meta.json")
+ENGLISH_LANDMARK_MLP_PATH = os.path.join("models", "english_landmark_mlp.pt")
+ENGLISH_INPUT_SIZE = 224
+ENGLISH_MIN_CONFIDENCE = 0.85
+ENGLISH_PREDICT_EVERY_N_FRAMES = 3
+ENGLISH_CONSECUTIVE_MATCHES = 3
 
-# 27 ASL classes (must match training data order)
+# 29 ASL classes (must match training data order)
 ENGLISH_CLASSES = [
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
     "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-    "U", "V", "W", "X", "Y", "Z", "SPACE"
+    "U", "V", "W", "X", "Y", "Z", "SPACE", "DEL", "NOTHING"
 ]
 
 # English word-level signs (ASL fingerspells letter-by-letter)

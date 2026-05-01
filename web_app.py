@@ -156,7 +156,7 @@ async def set_direction(req: DirectionRequest):
             if english_detector is None:
                 raise HTTPException(
                     status_code=400,
-                    detail="English model not trained yet. Place english_sign_best.pt in models/ directory."
+                    detail="English model not trained yet. Place english_sign_classifier.pt in models/ directory."
                 )
             active_detector = english_detector
         else:

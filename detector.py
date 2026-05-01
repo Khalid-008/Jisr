@@ -1,15 +1,14 @@
-"""Sign Language Detection using YOLOv5 — supports Arabic and English."""
+"""Sign Language Detection using YOLOv5 — Arabic path only."""
 
 import time
 import math
 import cv2
 from ultralytics import YOLO
 from config import (
-    MODEL_PATH, ENGLISH_MODEL_PATH, CONFIDENCE_THRESHOLD, MAX_DETECTIONS,
+    MODEL_PATH, CONFIDENCE_THRESHOLD, MAX_DETECTIONS,
     MIN_SIGN_HOLD, MOVEMENT_THRESHOLD, MAX_DETECTION_AREA,
     WORD_PAUSE_THRESHOLD, SENTENCE_PAUSE_THRESHOLD,
-    ARABIC_CLASSES, ARABIC_WORD_SIGNS,
-    ENGLISH_CLASSES, ENGLISH_WORD_SIGNS
+    ARABIC_CLASSES, ARABIC_WORD_SIGNS
 )
 import mediapipe as mp
 
@@ -21,12 +20,20 @@ class SignDetector:
     model_path, classes, and word_signs passed to the constructor.
     """
 
-    def __init__(self, model_path, classes, word_signs=None):
+    def __init__(self, model_path, classes, word_signs=None, confidence=None):
+        """Initialize the sign detector.
+
+        Args:
+            model_path: Path to the trained YOLO model
+            classes: List of class names
+            word_signs: List of signs that represent whole words
+            confidence: Confidence threshold (defaults to language-specific config)
+        """
         self.classes = classes
         self.word_signs = word_signs or []
 
         self.model = YOLO(model_path)
-        self.model.conf = CONFIDENCE_THRESHOLD
+        self.model.conf = confidence if confidence is not None else CONFIDENCE_THRESHOLD
         self.model.max_det = MAX_DETECTIONS
 
         # Accepted sign state
@@ -65,7 +72,7 @@ class SignDetector:
             is_word_boundary: True if a word pause was detected
             is_sentence_boundary: True if a sentence pause was detected
         """
-        results = self.model(frame, verbose=False, imgsz=320)
+        results = self.model(frame, verbose=False, imgsz=640)
         detections = results[0].boxes
 
         annotated_frame = results[0].plot()
@@ -221,13 +228,7 @@ def create_arabic_detector():
     )
 
 
-def create_english_detector():
-    """Create a detector for English/ASL Sign Language."""
-    return SignDetector(
-        model_path=ENGLISH_MODEL_PATH,
-        classes=ENGLISH_CLASSES,
-        word_signs=ENGLISH_WORD_SIGNS
-    )
+from english_classifier import create_english_detector  # noqa: F401
 
 
 # Backward compatibility wrapper for desktop app.py

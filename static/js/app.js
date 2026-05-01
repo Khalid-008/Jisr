@@ -286,35 +286,42 @@ const UIModule = (() => {
     document.getElementById("btnAr2En").addEventListener("click", () => switchDirection("ar2en"));
     document.getElementById("btnEn2Ar").addEventListener("click", () => switchDirection("en2ar"));
 
-    // Input mode toggle (camera vs text)
-    const btnInCam = document.getElementById("inputModeCamera");
-    const btnInTxt = document.getElementById("inputModeText");
+    // Input mode toggle (camera vs text vs voice)
+    const btnInCam   = document.getElementById("inputModeCamera");
+    const btnInTxt   = document.getElementById("inputModeText");
+    const btnInVoice = document.getElementById("inputModeVoice");
     const cameraView = document.getElementById("cameraView");
     const textView   = document.getElementById("textView");
-    const camControls = document.getElementById("cameraControls");
-    const txtControls = document.getElementById("textControls");
+    const voiceView  = document.getElementById("voiceView");
+    const camControls   = document.getElementById("cameraControls");
+    const txtControls   = document.getElementById("textControls");
+    const voiceControls = document.getElementById("voiceControls");
 
-    btnInCam.addEventListener("click", () => {
-      btnInCam.classList.add("active");
-      btnInTxt.classList.remove("active");
-      cameraView.style.display = "block";
-      textView.style.display   = "none";
-      camControls.style.display = "flex";
-      txtControls.style.display = "none";
-    });
-
-    btnInTxt.addEventListener("click", () => {
-      if (AppState.isDetecting) {
+    function selectInputMode(mode) {
+      if (mode !== "camera" && AppState.isDetecting) {
         CameraModule.stopCamera();
         setState({ isDetecting: false, status: "idle" });
       }
-      btnInTxt.classList.add("active");
-      btnInCam.classList.remove("active");
-      cameraView.style.display = "none";
-      textView.style.display   = "flex";
-      camControls.style.display = "none";
-      txtControls.style.display = "flex";
-    });
+      if (mode !== "voice" && typeof VoiceModule !== "undefined") {
+        VoiceModule.stopIfRecording();
+      }
+
+      btnInCam.classList.toggle("active", mode === "camera");
+      btnInTxt.classList.toggle("active", mode === "text");
+      if (btnInVoice) btnInVoice.classList.toggle("active", mode === "voice");
+
+      cameraView.style.display = mode === "camera" ? "block" : "none";
+      textView.style.display   = mode === "text"   ? "flex"  : "none";
+      if (voiceView) voiceView.style.display = mode === "voice" ? "block" : "none";
+
+      camControls.style.display   = mode === "camera" ? "flex" : "none";
+      txtControls.style.display   = mode === "text"   ? "flex" : "none";
+      if (voiceControls) voiceControls.style.display = mode === "voice" ? "flex" : "none";
+    }
+
+    btnInCam.addEventListener("click", () => selectInputMode("camera"));
+    btnInTxt.addEventListener("click", () => selectInputMode("text"));
+    if (btnInVoice) btnInVoice.addEventListener("click", () => selectInputMode("voice"));
 
     // Navbar scroll effect
     window.addEventListener("scroll", () => {
@@ -452,6 +459,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   CameraModule.init();
   ASLDisplayModule.init();
   TextToSignModule.init();
+  if (typeof VoiceModule !== "undefined") VoiceModule.init();
   UIModule.init();
 
   // Check which models are available

@@ -7,6 +7,8 @@
 const TextToSignModule = (() => {
   const ARABIC_MULTI = ["لا"];
   const ARABIC_DIACRITICS = /[\u064B-\u065F]/g;
+  // Arabic punctuation inside the 0x0600-0x06FF block: \u061F \u060C \u061B and others
+  const ARABIC_PUNCT = /[\u0600-\u0605\u060C\u061B\u061F\u066A-\u066D\u06D4]/g;
 
   let inputEl    = null;
   let langHintEl = null;
@@ -23,24 +25,29 @@ const TextToSignModule = (() => {
   }
 
   function convert() {
-    const text = inputEl.value.trim();
-    if (!text) return;
+    convertText(inputEl.value, langHintEl);
+  }
+
+  function convertText(rawText, hintEl) {
+    const text = (rawText || "").trim();
+    if (!text) return false;
 
     const lang = _detectLanguage(text);
     if (!lang) {
-      langHintEl.textContent = "لا توجد أحرف يمكن تحويلها.";
-      return;
+      if (hintEl) hintEl.textContent = "لا توجد أحرف يمكن تحويلها.";
+      return false;
     }
 
     const chars = lang === "ar" ? _decomposeArabic(text) : _decomposeEnglish(text);
     if (!chars.length) {
-      langHintEl.textContent = lang === "ar" ? "لم يُعثر على أحرف عربية." : "No letters found.";
-      return;
+      if (hintEl) hintEl.textContent = lang === "ar" ? "لم يُعثر على أحرف عربية." : "No letters found.";
+      return false;
     }
 
     const endpoint = lang === "ar" ? "/api/arabic-signs" : "/api/signs";
     ASLDisplayModule.setSignEndpoint(endpoint);
     ASLDisplayModule.play(chars, 800);
+    return true;
   }
 
   function clearInput() {
@@ -75,7 +82,7 @@ const TextToSignModule = (() => {
 
   function _decomposeEnglish(text) {
     const chars = [];
-    for (const ch of text.toUpperCase()) {
+    for (const ch of text.replace(/[^a-zA-Z ]/g, "").toUpperCase()) {
       if (ch >= "A" && ch <= "Z")       chars.push(ch);
       else if (ch === " " && chars.length && chars[chars.length - 1] !== "SPACE") {
         chars.push("SPACE");
@@ -86,7 +93,7 @@ const TextToSignModule = (() => {
   }
 
   function _decomposeArabic(text) {
-    let clean = text.replace(ARABIC_DIACRITICS, "");
+    let clean = text.replace(ARABIC_DIACRITICS, "").replace(ARABIC_PUNCT, "");
     clean = clean.replace(/[اإآٱ]/g, "أ");
     const chars = [];
     let i = 0;
@@ -110,5 +117,5 @@ const TextToSignModule = (() => {
     return chars;
   }
 
-  return { init };
+  return { init, convertText };
 })();

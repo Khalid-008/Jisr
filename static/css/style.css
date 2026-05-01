@@ -898,7 +898,7 @@ ul { list-style: none; }
   .toast { max-width: 100%; }
 }
 
-/* ── Input Mode Toggle (Camera vs Text) ───────────────────── */
+/* ── Input Mode Toggle (Camera / Text / Voice) ─────────────── */
 .input-mode-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -908,6 +908,11 @@ ul { list-style: none; }
   margin-bottom: var(--sp-2);
   gap: 3px;
   box-sizing: border-box;
+}
+
+/* Voice button spans both columns — full width below camera/text */
+#inputModeVoice {
+  grid-column: 1 / -1;
 }
 
 .input-mode-btn {
@@ -955,7 +960,7 @@ ul { list-style: none; }
   padding: var(--sp-3);
   border: 1.5px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-accent-light);
   color: var(--color-text-primary);
   font-family: var(--font-system);
   font-size: 22px;
@@ -985,4 +990,134 @@ ul { list-style: none; }
   text-align: center;
   min-height: 18px;
   font-weight: 600;
+}
+
+/* ── Voice input ───────────────────────────────────────────── */
+#voiceView {
+  display: block;          /* block stacking — no flex confusion */
+  width: 100%;
+  margin-bottom: var(--sp-2);
+}
+
+.voice-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.voice-lang-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.voice-lang-select {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-system);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.voice-lang-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.record-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 24px 16px;
+  margin-bottom: 10px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  box-sizing: border-box;
+  transition: background var(--ease-fast), border-color var(--ease-fast),
+              color var(--ease-fast), transform var(--ease-fast);
+}
+
+.record-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.record-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.record-btn.recording {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  transform: scale(0.98);
+  animation: recordingPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes recordingPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 30, 123, 0.45); }
+  50%      { box-shadow: 0 0 0 12px rgba(233, 30, 123, 0); }
+}
+
+.record-label { font-size: 13px; }
+
+.voice-status {
+  font-size: 13px;
+  color: var(--color-accent);
+  text-align: center;
+  min-height: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.voice-status.error { color: #d32f2f; }
+
+/* Transcript textarea — identical to #t2sInput */
+#voiceTranscript {
+  width: 100%;
+  min-height: 160px;
+  padding: var(--sp-3);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-light);
+  color: var(--color-text-primary);
+  font-family: var(--font-system);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+  resize: none;
+  text-align: center;
+  direction: auto;
+  transition: border-color var(--ease-fast), box-shadow var(--ease-fast);
+  box-sizing: border-box;
+  display: block;
+}
+
+#voiceTranscript::placeholder {
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+#voiceTranscript:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(233, 30, 123, 0.15);
 }

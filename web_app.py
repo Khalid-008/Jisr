@@ -11,7 +11,7 @@ import logging
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -118,6 +118,11 @@ class SettingsResponse(BaseModel):
 class TTSRequest(BaseModel):
     text: str
     language: str = "en"  # "en" | "ar"
+
+
+class TranscribeResponse(BaseModel):
+    text: str
+    language: str
 
 
 class ClearResponse(BaseModel):
@@ -277,6 +282,57 @@ async def text_to_speech(req: TTSRequest):
     except Exception as e:
         logger.error(f"TTS error: {e}")
         raise HTTPException(status_code=500, detail=f"TTS error: {e}")
+
+
+@app.post("/api/transcribe", response_model=TranscribeResponse)
+async def transcribe_audio(
+    audio: UploadFile = File(...),
+    language: Optional[str] = Form(None),
+):
+    """Transcribe a recorded audio blob using OpenAI Whisper. Auto-detects ar/en when language is omitted."""
+    api_key = translator_instance._api_key
+    if not api_key:
+        raise HTTPException(status_code=400, detail="OpenAI API key not configured")
+
+    audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise HTTPException(status_code=422, detail="Audio payload is empty")
+    if len(audio_bytes) > 25 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Audio exceeds 25 MB limit")
+
+    lang_hint = language.strip().lower() if language and language.strip() else None
+    if lang_hint not in (None, "ar", "en"):
+        lang_hint = None
+
+    filename = audio.filename or "recording.webm"
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        kwargs = {
+            "model": "whisper-1",
+            "file": (filename, audio_bytes, audio.content_type or "audio/webm"),
+            "response_format": "verbose_json",
+            # Prompt nudges Whisper away from punctuation so signs display cleanly
+            "prompt": "بدون علامات ترقيم no punctuation marks",
+        }
+        if lang_hint:
+            kwargs["language"] = lang_hint
+        result = await asyncio.get_event_loop().run_in_executor(
+            None, lambda: client.audio.transcriptions.create(**kwargs)
+        )
+        text = (getattr(result, "text", "") or "").strip()
+        detected = getattr(result, "language", None) or lang_hint or ""
+        if detected.startswith("ar"):
+            detected = "ar"
+        elif detected.startswith("en"):
+            detected = "en"
+        return TranscribeResponse(text=text, language=detected)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Transcription error: {e}")
+        raise HTTPException(status_code=500, detail=f"Transcription error: {e}")
 
 
 # ---------------------------------------------------------------------------

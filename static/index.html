@@ -77,6 +77,15 @@
               </svg>
               <span>اكتب نصاً</span>
             </button>
+            <button class="input-mode-btn" id="inputModeVoice" type="button" data-input-mode="voice">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span>صوت / Voice</span>
+            </button>
           </div>
 
           <!-- Camera view -->
@@ -95,6 +104,29 @@
             <div class="t2s-lang-hint" id="t2sLangHint"></div>
           </div>
 
+          <!-- Voice input view -->
+          <div id="voiceView" style="display:none;">
+            <div class="voice-lang-row">
+              <span class="voice-lang-label">اللغة / Language:</span>
+              <select id="voiceLang" class="voice-lang-select">
+                <option value="">تلقائي / Auto-detect</option>
+                <option value="ar">عربي / Arabic</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <button class="record-btn" id="btnRecord" type="button">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span class="record-label">اضغط مع الاستمرار للتحدث</span>
+            </button>
+            <div class="voice-status" id="voiceStatus"></div>
+            <textarea id="voiceTranscript" placeholder="سيظهر النص هنا بعد التسجيل... / Transcript appears here..."></textarea>
+          </div>
+
           <div class="camera-controls" id="cameraControls">
             <button class="btn-primary" id="btnStart">بدء الكشف</button>
             <button class="btn-secondary" id="btnClear" disabled>مسح</button>
@@ -102,6 +134,10 @@
           <div class="camera-controls" id="textControls" style="display:none;">
             <button class="btn-primary" id="btnT2SConvert">عرض بالإشارات</button>
             <button class="btn-secondary" id="btnT2SClear">مسح</button>
+          </div>
+          <div class="camera-controls" id="voiceControls" style="display:none;">
+            <button class="btn-primary" id="btnVoiceConvert">عرض بالإشارات</button>
+            <button class="btn-secondary" id="btnVoiceClear">مسح</button>
           </div>
         </div>
 
@@ -189,6 +225,7 @@
   <script src="/static/js/camera.js?v=4"></script>
   <script src="/static/js/asl-display.js?v=4"></script>
   <script src="/static/js/text-to-sign.js?v=4"></script>
+  <script src="/static/js/voice.js?v=1"></script>
   <script src="/static/js/app.js?v=4"></script>
 </body>
 
